@@ -69,6 +69,12 @@ TEST(ManualTest, Test)
 	//auto it=list.constBegin();
 	//(*it) = Grades{ 0,"hoge" };
 
+	//ID:17 ConstIteratorから、Iteratorのコピーが作成されないかをチェック
+	//List list;
+	//auto it=list.begin();
+	//auto constIt=list.constBegin();
+	//it = constIt;
+
 	//ID:19 イテレータの代入を行う IteratorにConstIteratorを代入できない事をチェック
 	//List list;
 	//auto it = list.begin();
