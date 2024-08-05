@@ -1011,13 +1011,13 @@ TEST(TestIterator, Test26) {
 //リストの参照がない状態で呼び出した際の挙動
 TEST(TestConstIterator, Test0) {
 	List::ConstIterator it{ nullptr };
-	EXPECT_ANY_THROW((*it).score);
+	EXPECT_DEATH((*it).score, ".*");
 }
 
 //リストが空の際の、先頭イテレータに対して呼び出した際の挙動
 TEST(TestConstIterator, Test3) {
 	List list;
-	EXPECT_ANY_THROW((*list.constBegin()).score);
+	EXPECT_DEATH((*list.constBegin()).score, ".*");
 }
 
 //末尾イテレータに対して呼び出した際の挙動
@@ -1025,7 +1025,7 @@ TEST(TestConstIterator, Test4) {
 	List list;
 	list.add(Grades{ 0,"hoge" });
 	list.add(Grades{ 1,"fuga" });
-	EXPECT_ANY_THROW((*list.constEnd()).score);
+	EXPECT_DEATH((*list.constEnd()).score, ".*");
 }
 
 
@@ -1035,14 +1035,14 @@ TEST(TestConstIterator, Test4) {
 //リストの参照がない状態で呼び出した際の挙動
 TEST(TestConstIterator, Test5) {
 	auto it = List::ConstIterator{ nullptr };
-	EXPECT_ANY_THROW(++it);
+	EXPECT_DEATH(++it, ".*");
 }
 
 //リストが空の際の、先頭イテレータに対して呼び出した際の挙動
 TEST(TestConstIterator, Test6) {
 	List list;
 	auto it = list.constBegin();
-	EXPECT_ANY_THROW(++it);
+	EXPECT_DEATH(++it, ".*");
 }
 
 //末尾イテレータに対して呼び出した際の挙動
@@ -1051,7 +1051,7 @@ TEST(TestConstIterator, Test7) {
 	list.add(Grades{ 0,"hoge" });
 	list.add(Grades{ 1,"fuga" });
 	auto it = list.constEnd();
-	EXPECT_ANY_THROW(++it);
+	EXPECT_DEATH(++it, ".*");
 }
 
 //リストに二つ以上の要素がある場合に呼び出した際の挙動
@@ -1093,14 +1093,14 @@ TEST(TestConstIterator, Test10) {
 //リストの参照がない状態で呼び出した際の挙動
 TEST(TestConstIterator, Test11) {
 	auto it = List::ConstIterator{ nullptr };
-	EXPECT_ANY_THROW(--it);
+	EXPECT_DEATH(--it, ".*");
 }
 
 //リストが空の際の、先頭イテレータに対して呼び出した際の挙動
 TEST(TestConstIterator, Test12) {
 	List list;
 	auto it = list.constBegin();
-	EXPECT_ANY_THROW(--it);
+	EXPECT_DEATH(--it, ".*");
 }
 
 //末尾イテレータに対して呼び出した際の挙動
@@ -1109,7 +1109,7 @@ TEST(TestConstIterator, Test13) {
 	list.add(Grades{ 0,"hoge" });
 	list.add(Grades{ 1,"fuga" });
 	auto it = list.constEnd();
-	EXPECT_ANY_THROW(--it);
+	EXPECT_DEATH(--it, ".*");
 }
 
 //リストに二つ以上の要素がある場合に呼び出した際の挙動
