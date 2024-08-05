@@ -1,5 +1,6 @@
 #pragma once
 #include<string>
+#include <cassert>
 
 ///@brief 成績と名前を扱うクラスです。
 struct Grades
