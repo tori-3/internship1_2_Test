@@ -37,6 +37,8 @@ private:
 
         //! 後ろのノードのポインタ
         Node* back = nullptr;
+
+        List* parent = nullptr;
     };
 
 public:
@@ -58,36 +60,25 @@ public:
             return  *this;
         }
 
-        Grades operator *()const
+        const Grades& operator *()const
         {
-            //もしnullptrだったら
-            if (m_element == nullptr) 
-            {
-                throw std::runtime_error("nullptrです。");
-            }
 
-            //もしダミーノードだったら
-            if (m_element==m_element->back) 
-            {
-                throw std::runtime_error("無効なイテレーターです。");
-            }
+            assert(m_element != nullptr);
+
+            assert(m_element->back!=nullptr);
+
+            assert(m_element->front != nullptr);
 
             return m_element->data;
         }
 
         ConstIterator& operator --()
         {
-            //もしnullptrだったら
-            if (m_element == nullptr)
-            {
-                throw std::runtime_error("nullptrです。");
-            }
+            assert(m_element != nullptr);
 
-            //もしダミーノードだったら
-            if (m_element == m_element->back)
-            {
-                throw std::runtime_error("無効なイテレーターです。");
-            }
+            assert(m_element->back != nullptr);
+
+            assert(m_element->front != nullptr);
 
             m_element = m_element->front;
             return *this;
@@ -95,17 +86,11 @@ public:
 
         ConstIterator& operator ++()
         {
-            //もしnullptrだったら
-            if (m_element == nullptr)
-            {
-                throw std::runtime_error("nullptrです。");
-            }
+            assert(m_element != nullptr);
 
-            //もしダミーノードだったら
-            if (m_element == m_element->back)
-            {
-                throw std::runtime_error("無効なイテレーターです。");
-            }
+            assert(m_element->back != nullptr);
+
+            assert(m_element->front != nullptr);
 
             m_element = m_element->back;
             return *this;
@@ -113,17 +98,11 @@ public:
 
         ConstIterator operator --(int)
         {
-            //もしnullptrだったら
-            if (m_element == nullptr)
-            {
-                throw std::runtime_error("nullptrです。");
-            }
+            assert(m_element != nullptr);
 
-            //もしダミーノードだったら
-            if (m_element == m_element->back)
-            {
-                throw std::runtime_error("無効なイテレーターです。");
-            }
+            assert(m_element->back != nullptr);
+
+            assert(m_element->front != nullptr);
 
             auto old = *this;
             m_element = m_element->front;
@@ -132,17 +111,11 @@ public:
 
         ConstIterator operator ++(int)
         {
-            //もしnullptrだったら
-            if (m_element == nullptr)
-            {
-                throw std::runtime_error("nullptrです。");
-            }
+            assert(m_element != nullptr);
 
-            //もしダミーノードだったら
-            if (m_element == m_element->back)
-            {
-                throw std::runtime_error("無効なイテレーターです。");
-            }
+            assert(m_element->back != nullptr);
+
+            assert(m_element->front != nullptr);
 
             auto old = *this;
             m_element = m_element->back;
@@ -166,6 +139,13 @@ public:
             return m_element;
         }
 
+        ///@brief ダミーノードか調べます。
+        ///@return ダミーノードならtrue そうでないならfalseを返します。
+        bool isDummyNode()const
+        {
+            return m_element->back == nullptr || m_element->front == nullptr;
+        }
+
     protected:
 
         Node* m_element;
@@ -179,55 +159,51 @@ public:
 
         Grades& operator *()
         {
-            //もしnullptrだったら
-            if (m_element == nullptr)
-            {
-                throw std::runtime_error("nullptrです。");
-            }
+            assert(m_element != nullptr);
 
-            //もしダミーノードだったら
-            if (m_element == m_element->back)
-            {
-                throw std::runtime_error("無効なイテレーターです。");
-            }
+            assert(m_element->back != nullptr);
+
+            assert(m_element->front != nullptr);
 
             return m_element->data;
         }
     };
 
     ///@brief Listのコンストラクタです。
-    List() :m_sentinel{ new Node{} }
+    List() :m_sentinelBegin{ new Node{} },m_sentinelEnd{ new Node{} }
     {
-        m_sentinel->back = m_sentinel;
-        m_sentinel->front = m_sentinel;
+        m_sentinelBegin->back = m_sentinelEnd;
+        m_sentinelEnd->front = m_sentinelBegin;
+        m_sentinelBegin->parent = this;
+        m_sentinelEnd->parent = this;
     }
 
     ///@brief リストの先頭イテレーターを返します
     ///@return 先頭イテレーター
-    Iterator begin() const
+    Iterator begin()
     {
-        return Iterator{ m_sentinel->back };
+        return Iterator{ m_sentinelBegin->back };
     }
 
     ///@brief リストの末尾イテレーターを返します
     ///@return 末尾イテレーター
-    Iterator end() const
+    Iterator end()
     {
-        return Iterator{ m_sentinel };
+        return Iterator{ m_sentinelEnd };
     }
 
     ///@brief リストの先頭コンストイテレーターを返します
     ///@return 先頭イテレーター
     ConstIterator constBegin() const
     {
-        return ConstIterator{ m_sentinel->back };
+        return ConstIterator{ m_sentinelBegin->back };
     }
 
     ///@brief リストの末尾コンストイテレーターを返します
     ///@return 末尾イテレーター
     ConstIterator constEnd() const
     {
-        return ConstIterator{ m_sentinel };
+        return ConstIterator{ m_sentinelEnd };
     }
 
     ///@brief リストの長さを返します
@@ -241,11 +217,11 @@ public:
     ///@param iterator 追加する位置のイテレーター
     ///@param addData 追加するデータ
     ///@return 追加に成功したらtrue 失敗したらfalse
-    bool insert(ConstIterator iterator, const Grades& addData) 
+    bool insert(ConstIterator iterator, const Grades& addData)
     {
         Node* node=iterator.getElement();
 
-        if (node == nullptr) 
+        if (node == nullptr||node->parent!=this) 
         {
             return false;
         }
@@ -258,6 +234,8 @@ public:
 
         addNode->front = frontNode;
         frontNode->back = addNode;
+
+        addNode->parent = this;
 
         ++m_size;
 
@@ -272,7 +250,7 @@ public:
 
         Node* node = iterator.getElement();
 
-        if (node == m_sentinel || node == nullptr) 
+        if (node == nullptr|| iterator.isDummyNode() || node->parent != this)
         {
             return false;
         };
@@ -295,7 +273,8 @@ public:
 
 private:
     //! 番兵のポインタ
-    Node* m_sentinel;
+    Node* m_sentinelBegin;
+    Node* m_sentinelEnd;
 
     //! リストの長さ
     size_t m_size = 0;
